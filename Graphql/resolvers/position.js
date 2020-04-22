@@ -97,14 +97,6 @@ module.exports = {
     },
     async updatePosiFloor(_, { posiId, floor }) {
       try {
-        const p_floor = await Position.findOne({ floor });
-        if (p_floor) {
-          throw new UserInputError("Floor is taken", {
-            errors: {
-              floor: "This Floor is taken",
-            },
-          });
-        }
         const updatedPosifloor = await Position.findByIdAndUpdate(
           posiId,
           {
