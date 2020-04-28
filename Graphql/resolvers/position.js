@@ -1,4 +1,5 @@
 const Position = require("../../Models/position");
+const Pc = require("../../Models/pc");
 const { UserInputError } = require("apollo-server");
 const { validatePosiInput } = require("../../util/validators");
 module.exports = {
@@ -25,7 +26,7 @@ module.exports = {
     },
   },
   Mutation: {
-    async createPosi(_, { input: { name, floor } }) {
+    async createPosi(_, { input: { name, floor, status } }) {
       const { valid, errors } = validatePosiInput(name, floor);
       if (!valid) {
         throw new UserInputError("Errors", { errors });
@@ -38,18 +39,10 @@ module.exports = {
           },
         });
       }
-      const p_floor = await Position.findOne({ floor });
-      if (p_floor) {
-        throw new UserInputError("Floor is taken", {
-          errors: {
-            floor: "This Floor is taken",
-          },
-        });
-      }
-
       const newPosi = new Position({
         name,
         floor,
+        status,
       });
       const posi = await newPosi.save();
       return posi;
@@ -61,7 +54,7 @@ module.exports = {
           await posi.delete();
           return "Position Delete Successfully";
         } else {
-          throw new Error("id not found");
+          throw new Error("Still Have PC in this Position");
         }
       } catch (err) {
         throw new Error(err);
@@ -111,6 +104,26 @@ module.exports = {
           updatedPosifloor.floor = floor;
         }
         return updatedPosifloor;
+      } catch (err) {
+        throw new Error(err);
+      }
+    },
+    async updatePosiStatus(_, { posiId, status }) {
+      try {
+        const updatedPosiStatus = await Position.findByIdAndUpdate(
+          posiId,
+          {
+            $set: { status },
+          },
+          { new: true }
+        ).exec();
+        if (!updatedPosiStatus) {
+          throw Error(`Couldn't find Pc with id ${posiId}`);
+        }
+        if (status !== undefined) {
+          updatedPosiStatus.status = status;
+        }
+        return updatedPosiStatus;
       } catch (err) {
         throw new Error(err);
       }

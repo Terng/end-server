@@ -8,21 +8,18 @@ module.exports = gql`
     assettag: String!
     vlan: String!
     ip: String!
-    locId: String!
-    posiId: String!
+    posiId: String
+    positionName: String!
+    positionFloor: String!
+    status: String!
     createdAt: String!
     modifyAt: String
-    position: [Position!]
   }
   type Position {
     id: ID!
     name: String!
     floor: String!
-  }
-  type Location {
-    id: ID!
-    country: String!
-    zipcode: String!
+    status: String!
   }
   type User {
     id: ID!
@@ -38,17 +35,15 @@ module.exports = gql`
     assettag: String!
     vlan: String!
     ip: String!
-    posiId: String!
+    positionName: String!
+    positionFloor: String!
+    status: String!
   }
   input PositionInput {
     name: String!
     floor: String!
+    status: String!
   }
-  input LocationInput {
-    country: String
-    zipcode: String
-  }
-
   input RegisterInput {
     username: String!
     password: String!
@@ -80,11 +75,7 @@ module.exports = gql`
     id: ID
     name: String
     floor: String
-  }
-  type locationPayload {
-    id: ID
-    country: String
-    zipcode: String
+    status: String
   }
   type UpdatePcPayload {
     id: ID
@@ -93,15 +84,20 @@ module.exports = gql`
     assettag: String
     vlan: String
     ip: String
-    posiId: String
     createdAt: String
     modifyAt: String
+    positionName: String!
+    positionFloor: String!
+    status: String!
+  }
+  type createPosiNamePayload {
+    id: ID
+    name: String
+    floor: String
   }
   type Query {
     getPcs: [Pc]
     getPc(pcId: ID!): Pc
-    getLocs: [Location]
-    getLoc(locId: ID!): locationPayload
     getPosis: [Position]
     getPosi(posiId: ID!): Position
   }
@@ -110,12 +106,11 @@ module.exports = gql`
     login(username: String!, password: String!): User!
 
     createPc(input: PcInput): UpdatePcPayload
-    createLoc(input: LocationInput!): locationPayload
     createPosi(input: PositionInput!): positionpayload
 
     deletePc(pcId: ID!): String
     deleteLoc(locId: ID!): String
-    deletePosi(posiId: ID!): String
+    deletePosi(posiId: ID!, pcId: ID!): String
 
     updateName(pcId: ID!, name: String!): UpdatePcPayload
     updateVlan(pcId: ID!, vlan: String!): UpdatePcPayload
@@ -123,5 +118,10 @@ module.exports = gql`
     updatePosi(pcId: ID!, posiId: String!): UpdatePcPayload
     updatePosiName(posiId: ID!, name: String!): positionpayload
     updatePosiFloor(posiId: ID!, floor: String!): positionpayload
+    updatePosiStatus(posiId: ID!, status: String!): positionpayload
+
+    updateStatus(pcId: ID!, status: String!): UpdatePcPayload
+    updatePCPosiName(pcId: ID!, positionName: String!): UpdatePcPayload
+    updatePCPosiFloor(pcId: ID!, positionFloor: String!): UpdatePcPayload
   }
 `;

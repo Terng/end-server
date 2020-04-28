@@ -31,7 +31,19 @@ module.exports = {
   Mutation: {
     async createPc(
       _,
-      { input: { name, sertag, assettag, vlan, ip, locid, posiId, createdAt } }
+      {
+        input: {
+          name,
+          sertag,
+          assettag,
+          vlan,
+          ip,
+          positionName,
+          positionFloor,
+          status,
+          createdAt,
+        },
+      }
     ) {
       const { valid, errors } = validatePcInput(
         name,
@@ -39,7 +51,10 @@ module.exports = {
         assettag,
         vlan,
         ip,
-        posiId
+        status,
+        positionName,
+        positionFloor
+        /* posiId */
       );
       if (!valid) {
         throw new UserInputError("Errors", { errors });
@@ -83,8 +98,9 @@ module.exports = {
         assettag,
         vlan,
         ip,
-        locid,
-        posiId,
+        positionName,
+        positionFloor,
+        status,
         createdAt: new Date().toISOString(),
       });
       const pc = await newPc.save();
@@ -179,6 +195,26 @@ module.exports = {
         throw new Error(err);
       }
     },
+    async updateStatus(_, { pcId, status, modifyAt }) {
+      try {
+        const updatedPc = await Pc.findByIdAndUpdate(
+          pcId,
+          {
+            $set: { status, modifyAt: new Date().toISOString() },
+          },
+          { new: true }
+        ).exec();
+        if (!updatedPc) {
+          throw Error(`Couldn't find Pc with id ${pcId}`);
+        }
+        if (status !== undefined) {
+          updatedPc.status = status;
+        }
+        return updatedPc;
+      } catch (err) {
+        throw new Error(err);
+      }
+    },
     async updatePosi(_, { pcId, posiId, modifyAt }) {
       try {
         const updatedPc = await Pc.findByIdAndUpdate(
@@ -193,6 +229,46 @@ module.exports = {
         }
         if (posiId !== undefined) {
           updatedPc.posiId = posiId;
+        }
+        return updatedPc;
+      } catch (err) {
+        throw new Error(err);
+      }
+    },
+    async updatePCPosiName(_, { pcId, positionName, modifyAt }) {
+      try {
+        const updatedPc = await Pc.findByIdAndUpdate(
+          pcId,
+          {
+            $set: { positionName, modifyAt: new Date().toISOString() },
+          },
+          { new: true }
+        ).exec();
+        if (!updatedPc) {
+          throw Error(`Couldn't find Pc with id ${pcId}`);
+        }
+        if (positionName !== undefined) {
+          updatedPc.positionName = positionName;
+        }
+        return updatedPc;
+      } catch (err) {
+        throw new Error(err);
+      }
+    },
+    async updatePCPosiFloor(_, { pcId, positionFloor, modifyAt }) {
+      try {
+        const updatedPc = await Pc.findByIdAndUpdate(
+          pcId,
+          {
+            $set: { positionFloor, modifyAt: new Date().toISOString() },
+          },
+          { new: true }
+        ).exec();
+        if (!updatedPc) {
+          throw Error(`Couldn't find Pc with id ${pcId}`);
+        }
+        if (positionFloor !== undefined) {
+          updatedPc.positionFloor = positionFloor;
         }
         return updatedPc;
       } catch (err) {

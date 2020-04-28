@@ -6,13 +6,11 @@ const locResolvers = require("./location");
 module.exports = {
   Query: {
     ...pcResolvers.Query,
-    ...locResolvers.Query,
-    ...positionResolvers.Query
+    ...positionResolvers.Query,
   },
   Mutation: {
     ...userResolvers.Mutation,
     ...pcResolvers.Mutation,
     ...positionResolvers.Mutation,
-    ...locResolvers.Mutation
-  }
+  },
 };
