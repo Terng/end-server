@@ -245,24 +245,29 @@ module.exports = {
       }
     },
     async updatePCPosiName(_, { pcId, positionName, modifyAt }) {
-      try {
-        const updatedPc = await Pc.findByIdAndUpdate(
-          pcId,
-          {
-            $set: { positionName, modifyAt: new Date().toISOString() },
+      let name = positionName;
+      const position = await Posi.findOne({ name });
+      if (position.status === "Expired") {
+        throw new UserInputError(`This Positiion is Not Avaliable`, {
+          errors: {
+            status: "Position Not Avaliable",
           },
-          { new: true }
-        ).exec();
-        if (!updatedPc) {
-          throw Error(`Couldn't find Pc with id ${pcId}`);
-        }
-        if (positionName !== undefined) {
-          updatedPc.positionName = positionName;
-        }
-        return updatedPc;
-      } catch (err) {
-        throw new Error(err);
+        });
       }
+      const updatedPc = await Pc.findByIdAndUpdate(
+        pcId,
+        {
+          $set: { positionName, modifyAt: new Date().toISOString() },
+        },
+        { new: true }
+      ).exec();
+      if (!updatedPc) {
+        throw Error(`Couldn't find Pc with id ${pcId}`);
+      }
+      if (positionName !== undefined) {
+        updatedPc.positionName = positionName;
+      }
+      return updatedPc;
     },
     async updatePCPosiFloor(_, { pcId, positionFloor, modifyAt }) {
       try {
