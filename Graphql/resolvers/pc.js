@@ -27,7 +27,16 @@ module.exports = {
         throw new Error(err);
       }
     },
+    async getPcsa() {
+      try {
+        const pcs = await Pc.find();
+        return pcs;
+      } catch (err) {
+        throw new Error(err);
+      }
+    },
   },
+
   Mutation: {
     async createPc(
       _,

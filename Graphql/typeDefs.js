@@ -2,16 +2,16 @@ const { gql } = require("apollo-server");
 
 module.exports = gql`
   type Pc {
-    id: ID!
-    name: String!
-    sertag: String!
-    assettag: String!
-    vlan: String!
-    ip: String!
+    id: ID
+    name: String
+    sertag: String
+    assettag: String
+    vlan: String
+    ip: String
     posiId: String
-    positionName: String!
-    positionFloor: String!
-    status: String!
+    positionName: String
+    positionFloor: String
+    status: String
     createdAt: String!
     modifyAt: String
   }
@@ -100,6 +100,7 @@ module.exports = gql`
     getPc(pcId: ID!): Pc
     getPosis: [Position]
     getPosi(posiId: ID!): Position
+    getPcsa: Pc
   }
   type Mutation {
     register(registerInput: RegisterInput): User!
@@ -118,7 +119,11 @@ module.exports = gql`
     updatePosi(pcId: ID!, posiId: String!): UpdatePcPayload
     updatePosiName(posiId: ID!, name: String!): positionpayload
     updatePosiFloor(posiId: ID!, floor: String!): positionpayload
-    updatePosiStatus(posiId: ID!, status: String!): positionpayload
+    updatePosiStatus(
+      posiId: ID!
+      status: String!
+      positionName: String!
+    ): positionpayload
 
     updateStatus(pcId: ID!, status: String!): UpdatePcPayload
     updatePCPosiName(pcId: ID!, positionName: String!): UpdatePcPayload

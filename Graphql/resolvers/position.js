@@ -108,8 +108,35 @@ module.exports = {
         throw new Error(err);
       }
     },
-    async updatePosiStatus(_, { posiId, status }) {
-      try {
+    async updatePosiStatus(_, { posiId, status, positionName }) {
+      if (status === "Expired") {
+        const position = await Position.findById(posiId);
+        const pc = await Pc.findOne({ positionName });
+        if (!pc) {
+          const updatedPosiStatus = await Position.findByIdAndUpdate(
+            posiId,
+            {
+              $set: { status },
+            },
+            { new: true }
+          ).exec();
+          if (!updatedPosiStatus) {
+            throw Error(`Couldn't find Pc with id ${posiId}`);
+          }
+          if (status !== undefined) {
+            updatedPosiStatus.status = status;
+          }
+          return updatedPosiStatus;
+        }
+        if (position.name == pc.positionName) {
+          throw new UserInputError("Still have PC in This Position", {
+            errors: {
+              status: "Still have PC in This Position",
+            },
+          });
+        }
+      }
+      if (status !== "Expired") {
         const updatedPosiStatus = await Position.findByIdAndUpdate(
           posiId,
           {
@@ -124,8 +151,6 @@ module.exports = {
           updatedPosiStatus.status = status;
         }
         return updatedPosiStatus;
-      } catch (err) {
-        throw new Error(err);
       }
     },
   },
