@@ -101,6 +101,15 @@ module.exports = {
           },
         });
       }
+
+      const position = await Posi.findOne({ name: positionName });
+      if (position.status === "Expired") {
+        throw new UserInputError(`This Positiion is Not Avaliable`, {
+          errors: {
+            positionName: "Position Not Avaliable",
+          },
+        });
+      }
       const newPc = new Pc({
         name,
         sertag,
